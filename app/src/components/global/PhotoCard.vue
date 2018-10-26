@@ -7,11 +7,11 @@
 
     <div class="mdc-card__actions">
 
-      <button class="mdc-icon-button mdc-card__action mdc-card__action--icon" title="Share">
+      <button class="mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Share">
         <mdi icon="heart-outline"></mdi>
       </button>
 
-      <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon" title="Share">
+      <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Share">
         <mdi icon="share"></mdi>
       </button>
 

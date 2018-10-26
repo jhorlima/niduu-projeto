@@ -4,10 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Niduugram</title>
-  <link href="https://cdn.materialdesignicons.com/2.8.94/css/materialdesignicons.min.css" rel="stylesheet" />
+  <link href="https://cdn.materialdesignicons.com/2.8.94/css/materialdesignicons.min.css" rel="stylesheet"/>
+  <style>
+    [v-cloak] > * {
+      display: none
+    }
+
+    [v-cloak]::before {
+      content: "Carregando …"
+    }
+  </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app" v-cloak></div>
 <!-- built files will be auto injected -->
 </body>
 </html>
