@@ -20,4 +20,11 @@ Route.get('/', () => {
   return {greeting: 'Hello world in JSON'};
 });
 
-Route.resource('photos', 'PhotoController').apiOnly(); //.middleware('auth')
+Route.get('/sessions', 'SessionController.index').middleware('auth');
+Route.post('/sessions', 'SessionController.create').validator('SessionUser');
+
+Route.post('/users', 'UserController.store').validator('StoreUser');
+
+Route.resource('/photos', 'PhotoController').apiOnly();
+
+Route.resource('/photos_like', 'PhotoLikeController').apiOnly().middleware('auth');

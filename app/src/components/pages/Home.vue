@@ -19,6 +19,7 @@
 </template>
 
 <script>
+  import Axios from 'axios';
   import PhotoCard from './../global/PhotoCard';
   import Fab from './../global/Fab';
 
@@ -28,16 +29,37 @@
       PhotoCard,
       Fab
     },
-    created: function () {
-      this.$http.get('http://localhost:3333/photos')
-        .then(response => {
-          this.photos = response.data;
-        });
-    },
     data() {
       return {
         photos: []
       };
+    },
+    beforeRouteEnter(to, from, next) {
+      Axios.get('/photos').then(({data}) => {
+        next((component) => {
+          component.photos = data;
+        });
+      }).catch(error => {
+
+        let status = 400;
+        let statusText = error.message;
+        let message = error.message;
+
+        if (error.response) {
+          status = error.response.status;
+          statusText = error.response.statusText;
+        }
+
+        next({
+          name: 'error',
+          params: {
+            error: status,
+            title: `${status} - ${statusText}`,
+            message: message,
+          },
+          redirect: true
+        });
+      });
     }
   };
 </script>

@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@material/layout-grid": "^0.40.1",
+    "axios": "^0.18.0",
     "material-components-web": "^0.40.1",
     "vue": "^2.5.2",
+    "vue-flex": "^2.1.2",
     "vue-resource": "^1.5.1",
     "vue-router": "^3.0.1"
   },

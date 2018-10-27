@@ -1,6 +1,6 @@
 <template>
   <transition name="slide-fade">
-    <button class="mdc-fab mdc-ripple teste" :class="cssClasses" @click="click()" id="absolute-fab">
+    <button class="mdc-fab" ref="ripple" :class="cssClasses" @click="click()" id="absolute-fab">
       <span class="material-icons mdc-fab__icon"><mdi :icon="icon"></mdi></span>
       <span class="mdc-fab__label" v-show="extended" v-text="label"></span>
     </button>
@@ -40,7 +40,7 @@
       }
     },
     mounted() {
-      new MDCRipple(document.querySelector('.mdc-ripple'));
+      new MDCRipple(this.$refs.ripple);
     }
   };
 </script>
@@ -58,5 +58,4 @@
     height: 56px;
     border-radius: 28px;
   }
-
 </style>

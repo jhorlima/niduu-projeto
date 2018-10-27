@@ -1,12 +1,12 @@
 <template>
-  <header class="mdc-top-app-bar mdc-top-app-bar--dense mdc-theme--primary mdc-elevation--z1">
+  <header class="mdc-top-app-bar mdc-top-app-bar--dense mdc-theme--primary mdc-elevation--z1" ref="toolbar">
     <div class="mdc-top-app-bar__row">
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
         <span class="mdc-top-app-bar__title">Niduugram</span>
       </section>
 
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        <button class="mdc-button mdc-ripple mdc-button--outlined">
+        <button class="mdc-button mdc-ripple mdc-button--outlined" ref="login">
           Login
         </button>
       </section>
@@ -33,12 +33,12 @@
   export default {
     name: "Header",
     mounted() {
-      new MDCRipple(document.querySelector('.mdc-ripple'));
-      new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
+      new MDCRipple(this.$refs.login);
+      new MDCTopAppBar(this.$refs.toolbar);
     },
     data() {
       return {
-        loading: this.$loading
+        loading: this.$axiosHelp.loading
       };
     }
   };

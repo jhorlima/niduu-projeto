@@ -1,12 +1,31 @@
 import Home from './../components/pages/Home';
-import Error404 from './../components/pages/Error404';
+import Error from '../components/pages/ErrorPage';
+import Login from '../components/pages/Login';
 
 export default [{
   path: '/',
   name: 'home',
-  component: Home
+  component: Home,
+  meta: {
+    auth: true
+  }
+}, {
+  path: '/login',
+  name: 'login',
+  component: Login
+}, {
+  path: '/error/:error',
+  name: 'error',
+  component: Error,
+  props: true
 }, {
   path: '*',
   name: 'error404',
-  component: Error404
+  component: Error,
+  props(route) {
+    return {
+      title: "404 - Página não encontrada.",
+      message: `O endereço <strong>${route.fullPath}</strong> não foi encontrado. Verifique se você digitou o endereço corretamente e tente novamente.`
+    };
+  }
 }];

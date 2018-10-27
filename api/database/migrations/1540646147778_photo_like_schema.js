@@ -3,20 +3,19 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema');
 
-class PhotoSchema extends Schema {
+class PhotoLikeSchema extends Schema {
   up() {
-    this.create('photos', (table) => {
+    this.create('photo_likes', (table) => {
       table.increments();
-      table.string('location').nullable();
-      table.string('path').notNullable();
       table.integer('user_id').unsigned().references('id').inTable('users');
+      table.integer('photo_id').unsigned().references('id').inTable('photos');
       table.timestamps();
     });
   }
 
   down() {
-    this.drop('photos');
+    this.drop('photo_likes');
   }
 }
 
-module.exports = PhotoSchema;
+module.exports = PhotoLikeSchema;
