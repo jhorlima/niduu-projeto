@@ -2,8 +2,6 @@ import Vue from 'vue';
 import App from './App';
 import VueRouter from 'vue-router';
 import Axios from 'axios';
-import VueFlex from "vue-flex";
-import "vue-flex/dist/vue-flex.css";
 
 import routes from './router/index';
 
@@ -17,7 +15,6 @@ Vue.prototype.$axiosHelp = {
   success: {show: false},
 };
 
-Vue.use(VueFlex);
 Vue.use(VueRouter);
 Vue.component('mdi', MDI);
 
