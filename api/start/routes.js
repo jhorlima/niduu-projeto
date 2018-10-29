@@ -25,6 +25,6 @@ Route.post('/sessions', 'SessionController.create').validator('SessionUser');
 
 Route.post('/users', 'UserController.store').validator('StoreUser');
 
-Route.resource('/photos', 'PhotoController').apiOnly();
+Route.resource('/photos', 'PhotoController').apiOnly().middleware('auth');
 
 Route.resource('/photos_like', 'PhotoLikeController').apiOnly().middleware('auth');

@@ -14,6 +14,17 @@ export default [{
   name: 'login',
   component: Login
 }, {
+  path: '/logoff',
+  name: 'logoff',
+  beforeRouteEnter(to, from, next) {
+    if (confirm("Deseja realmente desconectar?")) {
+      localStorage.removeItem('niduu-token');
+      next({name: 'login'});
+    } else {
+      next(false);
+    }
+  }
+}, {
   path: '/error/:error',
   name: 'error',
   component: Error,

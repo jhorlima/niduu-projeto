@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@material/layout-grid": "^0.40.1",
+    "animate.css": "^3.7.0",
     "axios": "^0.18.0",
     "material-components-web": "^0.40.1",
     "vue": "^2.5.2",

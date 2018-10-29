@@ -4,12 +4,18 @@ $mdc-theme-background: #fff;
 $mdc-fab-extended-height: 56px;
 
 @import "~material-components-web/material-components-web";
+@import "animate.css/animate.min.css";
 
 body {
   font-family: 'Google Sans',arial,sans-serif;
   display: flex;
   height: 100vh;
   margin: 0;
+}
+
+.mdc-button > i.mdi{
+  padding-right: 8px;
+  font-size: 20px;
 }
 
 @font-face {

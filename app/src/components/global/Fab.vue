@@ -1,10 +1,10 @@
 <template>
-  <transition name="slide-fade">
-    <button class="mdc-fab" ref="ripple" :class="cssClasses" @click="click()" id="absolute-fab">
-      <span class="material-icons mdc-fab__icon"><mdi :icon="icon"></mdi></span>
-      <span class="mdc-fab__label" v-show="extended" v-text="label"></span>
-    </button>
-  </transition>
+
+  <button class="mdc-fab animated fadeInRight" ref="ripple" :class="cssClasses" @click="click()" id="absolute-fab">
+    <span class="material-icons mdc-fab__icon"><mdi :icon="icon"></mdi></span>
+    <span class="mdc-fab__label" v-show="extended" v-text="label"></span>
+  </button>
+
 </template>
 
 <script>
@@ -23,8 +23,7 @@
     },
     methods: {
       click() {
-        this.extended = !this.extended;
-        this.$loading.enable = !this.$loading.enable;
+        this.$emit('action');
       }
     },
     data() {
@@ -47,7 +46,6 @@
 
 <style scoped>
   #absolute-fab {
-    transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
     position: fixed;
     bottom: 1.5rem;
     right: 1.5rem;

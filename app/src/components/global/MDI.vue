@@ -1,5 +1,5 @@
 <template>
-  <i class="mdi" :class="`mdi-${icon}`"></i>
+  <i class="material-icons mdi" :class="`mdi-${icon}`"></i>
 </template>
 
 <script>

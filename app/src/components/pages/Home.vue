@@ -6,59 +6,77 @@
 
       <div class="mdc-layout-grid__cell" v-for="photo in photos">
 
-        <photo-card :photo="photo"></photo-card>
+        <photo-card :photo="photo" class="animated fadeInUp"></photo-card>
 
       </div>
 
     </div>
 
-    <fab label="Adicionar Foto" icon="plus"></fab>
+    <fab label="Adicionar Foto" icon="plus" @action="abrirCamera"></fab>
+
+    <niduu-camera v-if="camera" @close="fecharCamera" @send="adicionarFotos"></niduu-camera>
 
   </div>
 
 </template>
 
 <script>
+  import {MDCRipple} from '@material/ripple';
   import Axios from 'axios';
-  import PhotoCard from './../global/PhotoCard';
-  import Fab from './../global/Fab';
+
+  import PhotoCard from '../global/PhotoCard';
+  import NiduuCamera from '../global/NiduuCamera';
+  import Fab from '../global/Fab';
 
   export default {
     name: "Home",
     components: {
       PhotoCard,
+      NiduuCamera,
       Fab
     },
     data() {
       return {
-        photos: []
+        photos: [],
+        camera: false
       };
     },
+    methods: {
+      abrirCamera() {
+        this.camera = true;
+      },
+      fecharCamera() {
+        this.camera = false;
+      },
+      adicionarFotos(foto) {
+        this.photos.unshift(foto);
+      }
+    },
     beforeRouteEnter(to, from, next) {
-      Axios.get('/photos').then(({data}) => {
-        next((component) => {
-          component.photos = data;
-        });
+      const token = localStorage.getItem('niduu-token');
+      return token ? next() : next({name: 'login'});
+    },
+    created() {
+      const token = localStorage.getItem('niduu-token');
+
+      Axios.get('/photos', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }).then(({data}) => {
+        this.photos = data;
       }).catch(error => {
 
-        let status = 400;
-        let statusText = error.message;
-        let message = error.message;
-
-        if (error.response) {
-          status = error.response.status;
-          statusText = error.response.statusText;
-        }
-
-        next({
+        this.$router.push({
           name: 'error',
           params: {
-            error: status,
-            title: `${status} - ${statusText}`,
-            message: message,
+            error: 400,
+            title: `400 - ${error.message}`,
+            message: error.message,
           },
           redirect: true
         });
+
       });
     }
   };
