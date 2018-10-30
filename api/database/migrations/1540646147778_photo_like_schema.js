@@ -7,8 +7,8 @@ class PhotoLikeSchema extends Schema {
   up() {
     this.create('photo_likes', (table) => {
       table.increments();
-      table.integer('user_id').unsigned().references('id').inTable('users');
-      table.integer('photo_id').unsigned().references('id').inTable('photos');
+      table.integer('user_id').unsigned().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
+      table.integer('photo_id').unsigned().references('id').inTable('photos').onUpdate('CASCADE').onDelete('CASCADE');
       table.timestamps();
     });
   }

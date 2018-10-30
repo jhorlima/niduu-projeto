@@ -20,11 +20,16 @@ Route.get('/', () => {
   return {greeting: 'Hello world in JSON'};
 });
 
-Route.get('/sessions', 'SessionController.index').middleware('auth');
-Route.post('/sessions', 'SessionController.create').validator('SessionUser');
+Route.get('sessions', 'SessionController.index').middleware('auth');
+Route.post('sessions', 'SessionController.create').validator('SessionUser');
 
-Route.post('/users', 'UserController.store').validator('StoreUser');
+Route.post('users', 'UserController.store').validator('StoreUser');
 
-Route.resource('/photos', 'PhotoController').apiOnly().middleware('auth');
+Route.get('photos/uploads/:path', 'PhotoController.uploads');
 
-Route.resource('/photos_like', 'PhotoLikeController').apiOnly().middleware('auth');
+Route.post('photos/like/:id', 'PhotoController.like').middleware('auth');
+Route.delete('photos/like/:id', 'PhotoController.unlike').middleware('auth');
+
+Route.resource('photos', 'PhotoController').validator(new Map([
+  [['photos.store'], ['StorePhoto']]
+])).apiOnly().middleware('auth');

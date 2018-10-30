@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import App from './App';
-import VueRouter from 'vue-router';
 import Axios from 'axios';
+import VueRouter from 'vue-router';
+import VueFractionGrid from 'vue-fraction-grid';
 
 import routes from './router/index';
 
@@ -16,6 +17,13 @@ Vue.prototype.$axiosHelp = {
 };
 
 Vue.use(VueRouter);
+Vue.use(VueFractionGrid, {
+  approach: 'desktop-first',
+  breakpoints: {
+    compact: '415px',
+    tablet: '416px 1100px'
+  }
+});
 Vue.component('mdi', MDI);
 
 window.axios = Axios;

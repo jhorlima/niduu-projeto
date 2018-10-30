@@ -3,17 +3,18 @@ $mdc-theme-secondary: #30c6cd;
 $mdc-theme-background: #fff;
 $mdc-fab-extended-height: 56px;
 
-@import "~material-components-web/material-components-web";
 @import "animate.css/animate.min.css";
+@import "normalize.css/normalize.css";
+@import "~material-components-web/material-components-web";
 
 body {
-  font-family: 'Google Sans',arial,sans-serif;
+  font-family: 'Google Sans', arial, sans-serif;
   display: flex;
   height: 100vh;
   margin: 0;
 }
 
-.mdc-button > i.mdi{
+.mdc-button-icon > i.mdi {
   padding-right: 8px;
   font-size: 20px;
 }

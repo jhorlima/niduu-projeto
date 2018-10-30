@@ -22,8 +22,8 @@
 </template>
 
 <script>
-  import {MDCRipple} from '@material/ripple';
   import Axios from 'axios';
+  import {MDCRipple} from '@material/ripple';
 
   import TextField from '../global/TextField';
   import Snackbar from '../global/Snackbar';

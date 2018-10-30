@@ -7,12 +7,16 @@
 
     <div class="mdc-card__actions">
 
-      <button class="mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Share">
-        <mdi icon="heart-outline"></mdi>
+      <button @click="like()" class="mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="favorite">
+        <mdi :icon="photo.liked ? 'heart' : 'heart-outline'"></mdi>
       </button>
 
       <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Share">
         <mdi icon="share"></mdi>
+      </button>
+
+      <button v-if="photo.owner" @click="deletePhoto()" class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Trash">
+        <mdi icon="trash-can-outline"></mdi>
       </button>
 
     </div>
@@ -33,6 +37,12 @@
         return {
           backgroundImage: `url(${photo.url})`
         };
+      },
+      deletePhoto() {
+        this.$emit('delete', this.photo);
+      },
+      like() {
+        this.$emit(this.photo.liked ? 'unlike': 'like', this.photo);
       }
     }
   };

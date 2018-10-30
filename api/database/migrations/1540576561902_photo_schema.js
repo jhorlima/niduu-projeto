@@ -7,9 +7,10 @@ class PhotoSchema extends Schema {
   up() {
     this.create('photos', (table) => {
       table.increments();
-      table.string('location').nullable();
       table.string('path').notNullable();
-      table.integer('user_id').unsigned().references('id').inTable('users');
+      table.decimal('latitude', 9, 6).nullable();
+      table.decimal('longitude', 9, 6).nullable();
+      table.integer('user_id').unsigned().references('id').inTable('users').onUpdate('CASCADE').onDelete('CASCADE');
       table.timestamps();
     });
   }

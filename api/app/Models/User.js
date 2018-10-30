@@ -7,6 +7,9 @@ const Model = use('Model');
 const Hash = use('Hash');
 
 class User extends Model {
+  static get hidden() {
+    return ['password'];
+  }
 
   static boot() {
     super.boot();
@@ -23,7 +26,7 @@ class User extends Model {
   }
 
   photos() {
-    return this.hasMany('App/Models/Photos');
+    return this.hasMany('App/Models/Photo');
   }
 }
 

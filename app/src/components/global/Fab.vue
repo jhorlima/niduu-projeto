@@ -1,8 +1,8 @@
 <template>
 
-  <button class="mdc-fab animated fadeInRight" ref="ripple" :class="cssClasses" @click="click()" id="absolute-fab">
+  <button class="mdc-fab mdc-fab--extended app-fab--absolute animated fadeInRight" @click="click()" ref="ripple">
     <span class="material-icons mdc-fab__icon"><mdi :icon="icon"></mdi></span>
-    <span class="mdc-fab__label" v-show="extended" v-text="label"></span>
+    <span class="mdc-fab__label" v-text="label"></span>
   </button>
 
 </template>
@@ -26,18 +26,6 @@
         this.$emit('action');
       }
     },
-    data() {
-      return {
-        extended: true
-      };
-    },
-    computed: {
-      cssClasses() {
-        return {
-          'mdc-fab--extended': this.extended
-        };
-      }
-    },
     mounted() {
       new MDCRipple(this.$refs.ripple);
     }
@@ -45,15 +33,16 @@
 </script>
 
 <style scoped>
-  #absolute-fab {
+  .app-fab--absolute {
     position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    z-index: 1;
+    bottom: 1rem;
+    right: 1rem;
   }
 
-  .mdc-fab.mdc-fab--extended {
-    height: 56px;
-    border-radius: 28px;
+  @media(min-width: 1024px) {
+    .app-fab--absolute {
+      bottom: 1.5rem;
+      right: 1.5rem;
+    }
   }
 </style>
