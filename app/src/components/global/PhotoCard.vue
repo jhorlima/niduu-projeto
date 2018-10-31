@@ -7,15 +7,11 @@
 
     <div class="mdc-card__actions">
 
-      <button @click="like()" class="mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="favorite">
+      <button @click="like()" class="mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Like">
         <mdi :icon="photo.liked ? 'heart' : 'heart-outline'"></mdi>
       </button>
 
-      <button class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Share">
-        <mdi icon="share"></mdi>
-      </button>
-
-      <button v-if="photo.owner" @click="deletePhoto()" class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Trash">
+      <button v-if="photo.owner" @click="deletePhoto()" class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Apagar">
         <mdi icon="trash-can-outline"></mdi>
       </button>
 

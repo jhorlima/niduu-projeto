@@ -124,7 +124,9 @@
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
         navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
+
           try {
+
             vm.$refs.video.srcObject = stream;
             vm.$refs.video.play();
 
@@ -137,7 +139,7 @@
             errorCamera();
           }
 
-        }, errorCamera);
+        }).catch(errorCamera);
 
       } else {
         errorCamera();
@@ -146,6 +148,20 @@
       vm.dialog.listen('MDCDialog:closed', (event) => {
         vm.$emit('close', event);
       });
+
+    },
+    destroyed() {
+
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
+          stream.getTracks().forEach(mediaStream => {
+            mediaStream.stop()
+          });
+        }).catch(error => {
+          console.log('getUserMedia() error', error);
+        });
+      }
+
     }
   };
 </script>

@@ -1,29 +1,14 @@
 <template>
   <div>
-    <form @submit.prevent="login">
-
-      <text-field v-model="form.username" id="username">Nome de Usuário</text-field>
-
-      <text-field v-model="form.password" id="password" type="password">Senha</text-field>
-
-      <router-link :to="{name: 'singup'}" class="mdc-button mdc-button--outlined" ref="singup">
-        Cadastrar
-      </router-link>
-
-      <button class="mdc-button mdc-button--raised" type="submit" ref="login">
-        Entrar
-      </button>
-
-    </form>
-
+    <div id="firebaseui-auth-container"></div>
     <snackbar v-if="notification" :message="notification" @action="dismissNotification()"></snackbar>
-
   </div>
 </template>
 
 <script>
   import Axios from 'axios';
-  import {MDCRipple} from '@material/ripple';
+  import firebase from 'firebase';
+  import firebaseui from 'firebaseui';
 
   import TextField from '../global/TextField';
   import Snackbar from '../global/Snackbar';
@@ -41,6 +26,13 @@
       };
     },
     methods: {
+      facebookLogin() {
+        // const provider = new Firebase.auth.FacebookAuthProvider();
+        //
+        // provider.setCustomParameters({
+        //   'display': 'popup'
+        // });
+      },
       login() {
 
         this.dismissNotification();
@@ -62,8 +54,29 @@
       return token ? next({name: 'home'}) : next();
     },
     mounted() {
-      new MDCRipple(this.$refs.singup.$el);
-      new MDCRipple(this.$refs.login);
+      const uiConfig = {
+        signInFlow: 'popup',
+        callbacks: {
+          signInSuccessWithAuthResult: (auth) => {
+            console.log(auth);
+            this.$router.push('/');
+          },
+          signInFailure: (error) => {
+            console.log(error);
+            this.notification = error.message;
+          }
+        },
+        signInOptions: [
+          firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        ]
+      };
+
+      const ui = new firebaseui.auth.AuthUI(firebase.auth());
+      ui.start('#firebaseui-auth-container', uiConfig);
     },
   };
 </script>
+
+<style>
+  @import "firebaseui/dist/firebaseui.css";
+</style>

@@ -1,6 +1,7 @@
 import Home from './../components/pages/Home';
 import Error from '../components/pages/ErrorPage';
 import Login from '../components/pages/Login';
+import Signup from '../components/pages/Singup'
 
 export default [{
   path: '/',
@@ -24,6 +25,10 @@ export default [{
       next(false);
     }
   }
+}, {
+  path: '/singup',
+  name: 'singup',
+  component: Signup
 }, {
   path: '/error/:error',
   name: 'error',
