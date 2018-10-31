@@ -9,10 +9,6 @@ const Photo = use('App/Models/Photo');
  */
 class PhotoController {
 
-  /**
-   * Show a list of all photos.
-   * GET photos
-   */
   async index({auth}) {
     const user = await auth.getUser();
 
@@ -37,10 +33,6 @@ class PhotoController {
     });
   }
 
-  /**
-   * Create/save a new photo.
-   * POST photos
-   */
   async store({request, auth}) {
 
     const user = await auth.getUser();
@@ -66,32 +58,16 @@ class PhotoController {
     });
   }
 
-  /**
-   * Display a single photo.
-   * GET photos/uploads/:path
-   */
   async uploads({params, response}) {
     return response.download(Helpers.tmpPath(`uploads/${params.path}`));
   }
 
-  /**
-   * Display a single photo.
-   * GET photos/:id
-   */
   async show({params}) {
     const photo = await Photo.findOrFail(params.id);
     await photo.load('user');
     return photo;
   }
 
-  /**
-   * Delete a photo with id.
-   * DELETE photos/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async destroy({params, auth}) {
 
     const user = await auth.getUser();

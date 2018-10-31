@@ -12,7 +12,7 @@ class SessionController {
 
   async create({request, auth}) {
     const {username, password} = request.all();
-    return await auth.attempt(username, password);
+    return await auth.withRefreshToken().attempt(username, password);
   }
 }
 
