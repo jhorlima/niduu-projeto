@@ -1,15 +1,13 @@
+import Firebase from 'firebase';
 import Home from './../components/pages/Home';
 import Error from '../components/pages/ErrorPage';
 import Login from '../components/pages/Login';
-import Signup from '../components/pages/Singup'
+import Signup from '../components/pages/Singup';
 
 export default [{
   path: '/',
   name: 'home',
-  component: Home,
-  meta: {
-    auth: true
-  }
+  component: Home
 }, {
   path: '/login',
   name: 'login',
@@ -19,8 +17,11 @@ export default [{
   name: 'logoff',
   beforeRouteEnter(to, from, next) {
     if (confirm("Deseja realmente desconectar?")) {
-      localStorage.removeItem('niduu-token');
-      next({name: 'login'});
+      Firebase.auth().signOut().then(() => {
+        next({name: 'login'});
+      }).catch(() => {
+        next(false);
+      });
     } else {
       next(false);
     }
@@ -41,7 +42,8 @@ export default [{
   props(route) {
     return {
       title: "404 - Página não encontrada.",
-      message: `O endereço <strong>${route.fullPath}</strong> não foi encontrado. Verifique se você digitou o endereço corretamente e tente novamente.`
+      message: `O endereço <strong>${route.fullPath}</strong> não foi encontrado. Verifique se você digitou o endereço 
+                corretamente e tente novamente.`
     };
   }
 }];

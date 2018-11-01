@@ -27,6 +27,8 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
+
   import {MDCRipple} from '@material/ripple';
   import {MDCTopAppBar} from '@material/top-app-bar/index';
 
@@ -35,42 +37,35 @@
     data() {
       return {
         loading: this.$axiosHelp.loading,
-        token: null
+        user: null
       };
     },
     methods: {
       action() {
-        if (this.token && confirm("Deseja realmente desconectar?")) {
-          localStorage.removeItem('niduu-token');
-          this.token = null;
+        if (this.user && confirm("Deseja realmente desconectar?")) {
+          this.$router.push({name: 'logoff'});
+        } else {
+          this.$router.push({name: 'login'});
         }
-
-        this.$router.push({name: 'login'});
       }
-    },
-    created() {
-      this.token = localStorage.getItem('niduu-token');
     },
     computed: {
       cssClasses() {
         return {
-          'mdc-button--raised': !!this.token,
-          'mdc-button--outlined': !this.token,
+          'mdc-button--raised': !!this.user,
+          'mdc-button--outlined': !this.user,
         };
       },
       label() {
-        return this.token ? "Desconectar" : "Entrar";
+        return this.user ? "Desconectar" : "Entrar";
       },
     },
+    created() {
+      this.user = this.$user;
+    },
     mounted() {
-      const vm = this;
       new MDCRipple(this.$refs.login);
       new MDCTopAppBar(this.$refs.toolbar);
-
-      setInterval(() => {
-        vm.token = localStorage.getItem('niduu-token');
-      }, 500);
-
     },
   };
 </script>

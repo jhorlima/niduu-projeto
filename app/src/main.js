@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import App from './App';
 import Axios from 'axios';
 import Firebase from 'firebase';
 import VueRouter from 'vue-router';
 import VueFractionGrid from 'vue-fraction-grid';
 
+import App from './App';
 import routes from './router/index';
 import MDI from './components/global/MDI';
 import {config} from './helpers/firebaseConfig';
@@ -12,9 +12,7 @@ import {config} from './helpers/firebaseConfig';
 Vue.config.productionTip = false;
 
 Vue.prototype.$axiosHelp = {
-  loading: {enable: false},
-  error: {show: false},
-  success: {show: false},
+  loading: {enable: false}
 };
 
 Vue.use(VueRouter);
@@ -32,8 +30,6 @@ Axios.defaults.baseURL = 'http://127.0.0.1:3333';
 
 Axios.interceptors.request.use(config => {
   Vue.prototype.$axiosHelp.loading.enable = true;
-  Vue.prototype.$axiosHelp.message = {show: false};
-
   return config;
 }, error => Promise.reject(error));
 
@@ -43,24 +39,19 @@ Axios.interceptors.response.use(response => {
   Vue.prototype.$axiosHelp.message = {show: true, error: false, ...{status, statusText}};
   return response;
 }, error => {
-  const {status, statusText} = error;
   Vue.prototype.$axiosHelp.loading.enable = false;
-  Vue.prototype.$axiosHelp.message = {show: true, error: true, ...{status, statusText}};
   return Promise.reject(error);
 });
 
-new Vue({
-  el: '#app',
+Firebase.initializeApp(config);
+
+const app = new Vue({
   render: h => h(App),
-  router: new VueRouter({routes}),
-  created() {
-    Firebase.initializeApp(config);
-    Firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        this.$router.push('/');
-      } else {
-        this.$router.push('/login');
-      }
-    });
-  }
+  router: new VueRouter({routes})
+});
+
+Firebase.auth().onAuthStateChanged(user => {
+  app._isMounted ? app.$mount('#app') : undefined;
+}, error => {
+  app._isMounted ? app.$mount('#app') : undefined;
 });

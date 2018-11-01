@@ -1,1 +1,5 @@
-{}
+{
+  "projects": {
+    "default": "niduu-1961d"
+  }
+}

@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "app",
+    "public": "app/dist",
     "ignore": [
       "api",
       "firebase.json",
@@ -9,8 +9,8 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "function": "app"
+        "source": "/api/**",
+        "functions": "app"
       }
     ]
   }

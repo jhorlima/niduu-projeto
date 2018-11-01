@@ -5,20 +5,19 @@
     <div class="mdc-layout-grid__inner animated fadeInUp">
 
       <div class="mdc-layout-grid__cell--span-12" v-if="!photos.length">
-      <p align="center">Não há fotos para serem exibidas no momento.</p>
+        <p align="center">Não há fotos para serem exibidas no momento.</p>
       </div>
 
       <div class="mdc-layout-grid__cell" v-for="photo in photos">
-
         <photo-card :photo="photo" :key="photo.id" @delete="apagarFoto" @like="like" @unlike="unlike"></photo-card>
-
       </div>
 
     </div>
 
     <fab label="Adicionar Foto" icon="plus" @action="abrirCamera"></fab>
 
-    <niduu-camera v-if="camera" :coords="coords" @close="fecharCamera" @send="adicionarFotos" @error="snackbar"></niduu-camera>
+    <niduu-camera v-if="camera" :coords="coords" @close="fecharCamera" @send="adicionarFotos"
+                  @error="snackbar"></niduu-camera>
 
     <snackbar v-if="notification" :message="notification" @action="dismissNotification"></snackbar>
 
@@ -27,12 +26,14 @@
 </template>
 
 <script>
+  import Vue from 'vue';
   import Axios from 'axios';
+  import Firebase from 'firebase';
 
-  import NiduuCamera from '../global/NiduuCamera';
-  import PhotoCard from '../global/PhotoCard';
-  import Snackbar from '../global/Snackbar';
   import Fab from '../global/Fab';
+  import Snackbar from '../global/Snackbar';
+  import PhotoCard from '../global/PhotoCard';
+  import NiduuCamera from '../global/NiduuCamera';
 
   export default {
     name: "Home",
@@ -59,6 +60,9 @@
         this.camera = false;
       },
       adicionarFotos(send, dialog) {
+        const user = Firebase.auth().currentUser;
+        const storageRef = Firebase.storage().ref(`photos/${user.uid}/`);
+
         const vm = this;
         const token = localStorage.getItem('niduu-token');
 
@@ -74,7 +78,7 @@
           vm.snackbar(error);
         });
       },
-      apagarFoto(photo){
+      apagarFoto(photo) {
         if (!confirm("Gostaria de apagar essa foto?"))
           return;
 
@@ -106,7 +110,7 @@
           vm.snackbar(error);
         });
       },
-      unlike(photo){
+      unlike(photo) {
         const vm = this;
         const token = localStorage.getItem('niduu-token');
 
@@ -152,24 +156,21 @@
       }
     },
     beforeRouteEnter(to, from, next) {
-      const token = localStorage.getItem('niduu-token');
-      return token ? next() : next({name: 'login'});
+      Firebase.auth().currentUser ? next() : next({name: 'home'});
     },
     created() {
-      const vm = this;
-
-      vm.getPhotos();
+      this.getPhotos();
 
       if (navigator.geolocation) {
 
         navigator.geolocation.getCurrentPosition((position) => {
-          vm.coords = position.coords;
+          this.coords = position.coords;
         }, error => {
-          vm.coords.error = "Seu navegador recusou compartilhar a localização!";
+          this.coords.error = "Seu navegador recusou compartilhar a localização!";
         });
 
       } else {
-        vm.coords.error = "Seu navegador não permite localização!";
+        this.coords.error = "Seu navegador não permite localização!";
       }
     }
   };
