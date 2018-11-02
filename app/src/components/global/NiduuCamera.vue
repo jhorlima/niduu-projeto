@@ -74,7 +74,9 @@
     },
     methods: {
       snap() {
-        this.$refs.canvas.getContext('2d').drawImage(this.$refs.video, 0, 0, this.$refs.video.width, this.$refs.video.height);
+        this.$refs.canvas.width = this.$refs.video.clientWidth;
+        this.$refs.canvas.height = this.$refs.video.clientHeight;
+        this.$refs.canvas.getContext('2d').drawImage(this.$refs.video, 0, 0, this.$refs.video.clientWidth, this.$refs.video.clientHeight);
         this.photo = this.$refs.canvas.toDataURL("image/png");
       },
       reload() {
