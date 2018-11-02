@@ -8,10 +8,10 @@
     <div class="mdc-card__actions">
 
       <button @click="like()" class="mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Like">
-        <mdi :icon="photo.liked ? 'heart' : 'heart-outline'"></mdi>
+        <mdi :icon="liked ? 'heart' : 'heart-outline'"></mdi>
       </button>
 
-      <button v-if="photo.owner" @click="deletePhoto()" class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Apagar">
+      <button v-if="owner" @click="deletePhoto()" class="material-icons mdc-icon-button mdc-card__action mdc-card__action--icon mdc-theme--primary" title="Apagar">
         <mdi icon="trash-can-outline"></mdi>
       </button>
 
@@ -20,6 +20,8 @@
 </template>
 
 <script>
+  import Firebase from 'firebase';
+
   export default {
     name: "PhotoCard",
     props: {
@@ -31,14 +33,25 @@
     methods: {
       stylePhoto(photo) {
         return {
-          backgroundImage: `url(${photo.url})`
+          backgroundImage: `url(${photo.image})`
         };
       },
       deletePhoto() {
         this.$emit('delete', this.photo);
       },
       like() {
-        this.$emit(this.photo.liked ? 'unlike': 'like', this.photo);
+        this.$emit(this.liked ? 'unlike': 'like', this.photo);
+      }
+    },
+    computed: {
+      user() {
+        return Firebase.auth().currentUser;
+      },
+      liked() {
+        return typeof this.photo.likes === "object" && this.photo.likes[this.user.uid]
+      },
+      owner() {
+        return this.photo.uid === this.user.uid
       }
     }
   };

@@ -57,21 +57,7 @@
 </template>
 
 <script>
-  import Vue from 'vue';
   import {MDCDialog} from '@material/dialog';
-
-  const dataURLtoFile = (dataurl, filename) => {
-    let arr = dataurl.split(','),
-      mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]),
-      n = bstr.length,
-      u8arr = new Uint8Array(n);
-
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, {type: mime});
-  };
 
   export default {
     name: "NiduuCamera",
@@ -95,49 +81,33 @@
         this.photo = null;
       },
       send() {
-        const send = new FormData();
-
-        send.append("image", dataURLtoFile(this.photo, 'image.png'));
-
-        if (!this.coords.error) {
-          send.append("latitude", this.coords.latitude);
-          send.append("longitude", this.coords.longitude);
-        }
-
-        this.$emit('send', send, this.dialog);
+        this.$emit('send', this.photo, this.dialog);
       }
     },
     beforeCreate() {
-      Vue.prototype.$axiosHelp.loading.enable = true;
+      this.$axiosHelp.loading.enable = true;
     },
     mounted() {
-      const vm = this;
 
       const errorCamera = () => {
-        vm.$emit('error', "Não foi possível abrir a camera do dispositivo!");
-        vm.$emit('close', event);
-        vm.dialog.close();
+        this.$emit('error', "Não foi possível abrir a camera do dispositivo!");
+        this.$emit('close', event);
+        this.dialog.close();
       };
 
-      vm.dialog = new MDCDialog(vm.$refs.dialog);
+      this.dialog = new MDCDialog(this.$refs.dialog);
 
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
         navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
 
-          try {
+          this.$refs.video.srcObject = stream;
+          this.$refs.video.play();
 
-            vm.$refs.video.srcObject = stream;
-            vm.$refs.video.play();
-
-            vm.$refs.video.onplay = () => {
-              Vue.prototype.$axiosHelp.loading.enable = false;
-              vm.dialog.open();
-            };
-
-          } catch (e) {
-            errorCamera();
-          }
+          this.$refs.video.onplay = () => {
+            this.$axiosHelp.loading.enable = false;
+            this.dialog.open();
+          };
 
         }).catch(errorCamera);
 
@@ -145,8 +115,8 @@
         errorCamera();
       }
 
-      vm.dialog.listen('MDCDialog:closed', (event) => {
-        vm.$emit('close', event);
+      this.dialog.listen('MDCDialog:closed', (event) => {
+        this.$emit('close', event);
       });
 
     },

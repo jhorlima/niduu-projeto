@@ -13,24 +13,6 @@ export default [{
   name: 'login',
   component: Login
 }, {
-  path: '/logoff',
-  name: 'logoff',
-  beforeRouteEnter(to, from, next) {
-    if (confirm("Deseja realmente desconectar?")) {
-      Firebase.auth().signOut().then(() => {
-        next({name: 'login'});
-      }).catch(() => {
-        next(false);
-      });
-    } else {
-      next(false);
-    }
-  }
-}, {
-  path: '/singup',
-  name: 'singup',
-  component: Signup
-}, {
   path: '/error/:error',
   name: 'error',
   component: Error,

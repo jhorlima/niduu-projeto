@@ -4,20 +4,19 @@
 
     <div class="mdc-layout-grid__inner animated fadeInUp">
 
-      <div class="mdc-layout-grid__cell--span-12" v-if="!photos.length">
+      <div class="mdc-layout-grid__cell--span-12" v-if="!hasPhotos">
         <p align="center">Não há fotos para serem exibidas no momento.</p>
       </div>
 
-      <div class="mdc-layout-grid__cell" v-for="photo in photos">
-        <photo-card :photo="photo" :key="photo.id" @delete="apagarFoto" @like="like" @unlike="unlike"></photo-card>
+      <div class="mdc-layout-grid__cell" v-for="(photo, key) in photos">
+        <photo-card :photo="photo" :key="key" @delete="apagarFoto" @like="like" @unlike="unlike"></photo-card>
       </div>
 
     </div>
 
     <fab label="Adicionar Foto" icon="plus" @action="abrirCamera"></fab>
 
-    <niduu-camera v-if="camera" :coords="coords" @close="fecharCamera" @send="adicionarFotos"
-                  @error="snackbar"></niduu-camera>
+    <niduu-camera v-if="camera" :coords="coords" @close="fecharCamera" @send="adicionarFotos" @error="snackbar"></niduu-camera>
 
     <snackbar v-if="notification" :message="notification" @action="dismissNotification"></snackbar>
 
@@ -26,7 +25,6 @@
 </template>
 
 <script>
-  import Vue from 'vue';
   import Axios from 'axios';
   import Firebase from 'firebase';
 
@@ -46,9 +44,10 @@
     data() {
       return {
         coords: {},
-        photos: [],
+        photos: {},
         camera: false,
-        notification: null
+        notification: null,
+        hasPhotos: false
       };
     },
     methods: {
@@ -60,70 +59,78 @@
         this.camera = false;
       },
       adicionarFotos(send, dialog) {
+        this.$axiosHelp.loading.enable = true;
         const user = Firebase.auth().currentUser;
-        const storageRef = Firebase.storage().ref(`photos/${user.uid}/`);
+        const photosStorageRef = Firebase.storage().ref(`photos/${user.uid}`);
+        const photosDatabaseRef = Firebase.database().ref('photos');
+        const key = photosDatabaseRef.push().key;
 
-        const vm = this;
-        const token = localStorage.getItem('niduu-token');
-
-        Axios.post('photos', send, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then(() => {
-          vm.getPhotos();
-          dialog.close('send');
-        }).catch((error) => {
-          vm.snackbar(error);
+        photosStorageRef.child(`${key}.png`).putString(send, 'data_url').then(snapshot => {
+          snapshot.ref.getDownloadURL().then(downloadURL => {
+            photosDatabaseRef.child(key).set({
+              key: key,
+              image: downloadURL,
+              latitude: !this.coords.error ? this.coords.latitude : null,
+              longitude: !this.coords.error ? this.coords.longitude : null,
+              uid: user.uid,
+              likes: {}
+            }, error => {
+              this.$axiosHelp.loading.enable = false;
+              if (error) {
+                this.snackbar(error.message);
+              } else {
+                dialog.close('send');
+                this.getPhotos();
+              }
+            });
+          })
         });
+
       },
       apagarFoto(photo) {
         if (!confirm("Gostaria de apagar essa foto?"))
           return;
 
-        const vm = this;
-        const token = localStorage.getItem('niduu-token');
+        this.$axiosHelp.loading.enable = true;
+        const photosDatabaseRef = Firebase.database().ref('photos');
 
-        Axios.delete(`photos/${photo.id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
+        photosDatabaseRef.child(photo.key).remove(error => {
+          this.$axiosHelp.loading.enable = false;
+          if (error) {
+            this.snackbar(error.message);
+          } else {
+            this.getPhotos();
           }
-        }).then(() => {
-          vm.getPhotos();
-        }).catch((error) => {
-          vm.snackbar(error.message);
         });
       },
-      like(photo) {
-        const vm = this;
-        const token = localStorage.getItem('niduu-token');
+      like(photo, unlike) {
+        this.$axiosHelp.loading.enable = true;
 
-        Axios.post(`photos/like/${photo.id}`, {}, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+        const user = Firebase.auth().currentUser;
+        const photosDatabaseRef = Firebase.database().ref('photos');
+
+        photo.likes = photo.likes || {};
+
+        if (unlike) {
+          photo.likes[user.uid] = null;
+        } else {
+          photo.likes[user.uid] = {
+            uid: user.uid,
+            provider: user.providerData.shift()
+          };
+        }
+
+        photosDatabaseRef.child(photo.key).update(photo, error => {
+          this.$axiosHelp.loading.enable = false;
+          if (error) {
+            this.snackbar(error.message);
+          } else {
+            this.getPhotos();
           }
-        }).then(() => {
-          photo.liked = true;
-          vm.getPhotos();
-        }).catch((error) => {
-          vm.snackbar(error);
         });
       },
       unlike(photo) {
-        const vm = this;
-        const token = localStorage.getItem('niduu-token');
-
-        Axios.delete(`photos/like/${photo.id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }).then(() => {
-          photo.liked = false;
-          vm.getPhotos();
-        }).catch((error) => {
-          vm.snackbar(error);
-        });
+       this.like(photo, true)
       },
       snackbar(message) {
         this.notification = message;
@@ -132,31 +139,15 @@
         this.notification = null;
       },
       getPhotos() {
-        const token = localStorage.getItem('niduu-token');
-
-        Axios.get('/photos', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }).then(({data}) => {
-          this.photos = data;
-        }).catch(error => {
-
-          this.$router.push({
-            name: 'error',
-            params: {
-              error: 400,
-              title: `400 - ${error.message}`,
-              message: error.message,
-            },
-            redirect: true
-          });
-
+        const photosRef = Firebase.database().ref('photos');
+        photosRef.once('value', photos => {
+          this.hasPhotos = photos.hasChildren();
+          this.photos = photos.val();
         });
       }
     },
     beforeRouteEnter(to, from, next) {
-      Firebase.auth().currentUser ? next() : next({name: 'home'});
+      Firebase.auth().currentUser ? next() : next({name: 'login'});
     },
     created() {
       this.getPhotos();

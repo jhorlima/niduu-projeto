@@ -47,7 +47,9 @@
         ]
       };
 
-      new Firebaseui.auth.AuthUI(Firebase.auth()).start(this.$refs.firebaseui, uiConfig);
+      const ui = Firebaseui.auth.AuthUI.getInstance() || new Firebaseui.auth.AuthUI(Firebase.auth());
+
+      ui.start(this.$refs.firebaseui, uiConfig);
     },
   };
 </script>

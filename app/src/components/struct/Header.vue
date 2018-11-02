@@ -27,6 +27,9 @@
 </template>
 
 <script>
+
+  import {EventBus} from './../../helpers/event-bus';
+
   import Firebase from 'firebase';
 
   import {MDCRipple} from '@material/ripple';
@@ -43,7 +46,9 @@
     methods: {
       action() {
         if (this.user && confirm("Deseja realmente desconectar?")) {
-          this.$router.push({name: 'logoff'});
+          Firebase.auth().signOut().then(() => {
+            this.$router.push({name: 'login'});
+          });
         } else {
           this.$router.push({name: 'login'});
         }
@@ -61,7 +66,8 @@
       },
     },
     created() {
-      this.user = this.$user;
+      this.user = Firebase.auth().currentUser;
+      EventBus.$on('change-user', (user) => this.user = user);
     },
     mounted() {
       new MDCRipple(this.$refs.login);

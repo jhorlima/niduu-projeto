@@ -7,7 +7,8 @@ import VueFractionGrid from 'vue-fraction-grid';
 import App from './App';
 import routes from './router/index';
 import MDI from './components/global/MDI';
-import {config} from './helpers/firebaseConfig';
+import {EventBus} from './helpers/event-bus';
+import {config} from './helpers/firebase-config';
 
 Vue.config.productionTip = false;
 
@@ -43,15 +44,21 @@ Axios.interceptors.response.use(response => {
   return Promise.reject(error);
 });
 
+let app;
+
+const mount = (user, error) => {
+
+  if (!app) {
+    app = new Vue({
+      el: '#app',
+      render: h => h(App),
+      router: new VueRouter({routes})
+    });
+  }
+
+  Firebase.auth().onAuthStateChanged(user => EventBus.$emit('change-user', user));
+};
+
 Firebase.initializeApp(config);
-
-const app = new Vue({
-  render: h => h(App),
-  router: new VueRouter({routes})
-});
-
-Firebase.auth().onAuthStateChanged(user => {
-  app._isMounted ? app.$mount('#app') : undefined;
-}, error => {
-  app._isMounted ? app.$mount('#app') : undefined;
-});
+Firebase.auth().languageCode = "pt";
+Firebase.auth().onAuthStateChanged(mount, (error) => mount(null, error));
