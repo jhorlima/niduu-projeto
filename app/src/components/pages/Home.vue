@@ -1,23 +1,21 @@
 <template>
 
-  <div class="mdc-layout-grid">
+  <div class="layout-column flex">
 
-    <div class="mdc-layout-grid__inner animated fadeInUp">
+    <div class="layout-row layout-wrap flex layout-padding" :class="layout">
 
-      <div class="mdc-layout-grid__cell--span-12" v-if="!hasPhotos">
+      <div v-if="!hasPhotos">
         <p align="center">Não há fotos para serem exibidas no momento.</p>
       </div>
 
-      <div class="mdc-layout-grid__cell" v-for="(photo, key) in photos">
+      <div class="flex flex-xs-100 flex-gt-xs-50 flex-gt-sm-33 flex-gt-lg-25" v-for="(photo, key) in photos">
         <photo-card :photo="photo" :key="key" @delete="apagarFoto" @like="like" @unlike="unlike"></photo-card>
       </div>
 
     </div>
 
     <fab label="Adicionar Foto" icon="plus" @action="abrirCamera"></fab>
-
     <niduu-camera v-if="camera" :coords="coords" @close="fecharCamera" @send="adicionarFotos" @error="snackbar"></niduu-camera>
-
     <snackbar v-if="notification" :message="notification" @action="dismissNotification"></snackbar>
 
   </div>
@@ -25,7 +23,6 @@
 </template>
 
 <script>
-  import Axios from 'axios';
   import Firebase from 'firebase';
 
   import Fab from '../global/Fab';
@@ -73,6 +70,7 @@
               latitude: !this.coords.error ? this.coords.latitude : null,
               longitude: !this.coords.error ? this.coords.longitude : null,
               uid: user.uid,
+              user_provider: user.providerData.find(provider => provider),
               likes: {}
             }, error => {
               this.$axiosHelp.loading.enable = false;
@@ -83,7 +81,7 @@
                 this.getPhotos();
               }
             });
-          })
+          });
         });
 
       },
@@ -116,11 +114,11 @@
         } else {
           photo.likes[user.uid] = {
             uid: user.uid,
-            provider: user.providerData.shift()
+            provider: user.providerData.find(provider => provider)
           };
         }
 
-        photosDatabaseRef.child(photo.key).update(photo, error => {
+        photosDatabaseRef.child(photo.key).child('likes').set(photo.likes, error => {
           this.$axiosHelp.loading.enable = false;
           if (error) {
             this.snackbar(error.message);
@@ -130,7 +128,7 @@
         });
       },
       unlike(photo) {
-       this.like(photo, true)
+        this.like(photo, true);
       },
       snackbar(message) {
         this.notification = message;
@@ -144,6 +142,14 @@
           this.hasPhotos = photos.hasChildren();
           this.photos = photos.val();
         });
+      }
+    },
+    computed: {
+      layout() {
+        return {
+          'layout-align-center-center': !this.hasPhotos,
+          'layout-align-none-none': !this.hasPhotos,
+        };
       }
     },
     beforeRouteEnter(to, from, next) {

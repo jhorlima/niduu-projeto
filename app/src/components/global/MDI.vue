@@ -13,3 +13,10 @@
     }
   };
 </script>
+
+<style>
+  .mdc-button-icon > i.mdi {
+    padding-right: 8px;
+    font-size: 20px;
+  }
+</style>

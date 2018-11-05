@@ -1,8 +1,6 @@
-import Firebase from 'firebase';
 import Home from './../components/pages/Home';
 import Error from '../components/pages/ErrorPage';
 import Login from '../components/pages/Login';
-import Signup from '../components/pages/Singup';
 
 export default [{
   path: '/',

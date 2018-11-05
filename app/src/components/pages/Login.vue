@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="layout-align-center-stretch layout-column flex">
     <div ref="firebaseui"></div>
     <snackbar v-if="notification" :message="notification" @action="dismissNotification()"></snackbar>
   </div>

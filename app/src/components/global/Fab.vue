@@ -33,6 +33,7 @@
 </script>
 
 <style scoped>
+
   .app-fab--absolute {
     position: fixed;
     bottom: 1rem;

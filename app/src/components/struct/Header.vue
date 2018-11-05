@@ -1,12 +1,12 @@
 <template>
-  <header class="mdc-top-app-bar mdc-top-app-bar--dense mdc-theme--primary mdc-elevation--z1" ref="toolbar">
+  <header class="mdc-top-app-bar mdc-top-app-bar--dense mdc-theme--primary mdc-elevation--z0" ref="toolbar">
 
     <div class="mdc-top-app-bar__row">
       <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
         <span class="mdc-top-app-bar__title">SnapNiduu</span>
       </section>
 
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" v-show="$route.name !== 'login'" role="toolbar">
         <button @click="action()" :class="cssClasses" class="mdc-button animated pulse" ref="login" v-text="label">
         </button>
       </section>
@@ -28,7 +28,7 @@
 
 <script>
 
-  import {EventBus} from './../../helpers/event-bus';
+  import {EventBus} from '../../helpers/js/event-bus';
 
   import Firebase from 'firebase';
 
@@ -77,7 +77,9 @@
 </script>
 
 <style scoped>
+
   header.mdc-top-app-bar {
     background-color: white;
+    position: relative;
   }
 </style>

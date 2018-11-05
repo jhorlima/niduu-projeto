@@ -1,16 +1,12 @@
 <template>
 
-  <div id="app" class="mdc-drawer-app-content">
+  <div id="app" class="layout-column flex">
 
     <mdc-header></mdc-header>
 
-    <main class="main-content" id="main-content">
+    <main class="layout-column flex main-content">
 
-      <div class="mdc-top-app-bar--dense-fixed-adjust">
-
-        <router-view></router-view>
-
-      </div>
+      <router-view></router-view>
 
     </main>
 
@@ -31,14 +27,10 @@
 
 <style>
 
-  .mdc-drawer-app-content {
-    flex: auto;
-    overflow: auto;
-  }
-
   .main-content {
+    position: relative;
     overflow: auto;
-    height: 100%;
+    -webkit-overflow-scrolling: touch;
   }
 
 </style>

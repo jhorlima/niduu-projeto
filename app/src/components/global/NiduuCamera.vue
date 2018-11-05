@@ -8,44 +8,46 @@
           <video v-show="!photo" width="500" height="375" ref="video" autoplay></video>
           <canvas v-show="photo" width="500" height="375" ref="canvas"></canvas>
 
-          <container class="botton-group" width="100%">
+          <div class="layout-column flex botton-group">
 
-            <grid horizontal="center" wrap="wrap" class="padding-fix">
+            <div class="layout-column flex layout-align-space-around-stretch padding-fix">
 
-              <grid-item size="1/1">
+              <div class="layout-row flex layout-margin layout-align-center-stretch animated fadeIn">
 
-                <grid horizontal="around" class="animated fadeIn">
+                <div>
+                  <button class="snap mdc-button mdc-fab mdc-theme--on-primary" @click="dialog.close()">
+                    <mdi class="mdc-fab__icon" icon="close"></mdi>
+                  </button>
+                </div>
 
-                  <grid-item v-if="photo">
-                    <button class="snap mdc-button mdc-fab mdc-theme--on-primary" @click="reload()">
-                      <mdi class="mdc-fab__icon" icon="reload"></mdi>
-                    </button>
-                  </grid-item>
+                <div v-if="photo">
+                  <button class="snap mdc-button mdc-fab mdc-theme--on-primary" @click="reload()">
+                    <mdi class="mdc-fab__icon" icon="reload"></mdi>
+                  </button>
+                </div>
 
-                  <grid-item v-if="photo" class="animated bounceIn">
-                    <button class="snap mdc-button mdc-fab mdc-fab--extended mdc-theme--on-primary" @click="send()">
-                      <mdi class="mdc-fab__icon" icon="send"></mdi>
-                      Postar
-                    </button>
-                  </grid-item>
+                <div v-if="photo" class="animated bounceIn">
+                  <button class="snap mdc-button mdc-fab mdc-fab--extended mdc-theme--on-primary" @click="send()">
+                    <mdi class="mdc-fab__icon" icon="send"></mdi>
+                    Postar
+                  </button>
+                </div>
 
-                  <grid-item v-if="!photo" class="animated bounceIn">
-                    <button class="snap mdc-button mdc-fab mdc-theme--on-primary" @click="snap()">
-                      <mdi class="mdc-fab__icon" icon="camera"></mdi>
-                    </button>
-                  </grid-item>
+                <div v-if="!photo" class="animated bounceIn">
+                  <button class="snap mdc-button mdc-fab mdc-theme--on-primary" @click="snap()">
+                    <mdi class="mdc-fab__icon" icon="camera"></mdi>
+                  </button>
+                </div>
 
-                </grid>
+              </div>
 
-              </grid-item>
-
-              <grid-item size="1/1" v-if="coords.error">
+              <div size="1/1" v-if="coords.error">
                 <p class="mdc-typography--subtitle1 mdc-theme--on-primary" align="center" v-text="coords.error"></p>
-              </grid-item>
+              </div>
 
-            </grid>
+            </div>
 
-          </container>
+          </div>
 
         </div>
 
@@ -126,8 +128,9 @@
 
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
+
           stream.getTracks().forEach(mediaStream => {
-            mediaStream.stop()
+            mediaStream.stop();
           });
         }).catch(error => {
           console.log('getUserMedia() error', error);
