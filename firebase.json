@@ -9,7 +9,11 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/api/**",
+        "function": "app"
+      },
+      {
+        "source": "/app/**",
         "destination": "/index.html"
       }
     ]

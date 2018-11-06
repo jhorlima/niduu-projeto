@@ -32,7 +32,7 @@ const mount = () => {
     });
   }
 
-  Firebase.auth().onAuthStateChanged(user => EventBus.$emit('change-user', user));
+  Firebase.auth().onAuthStateChanged(user => EventBus.$emit('change-user', user), err => console.log(err.message));
 };
 
 Firebase.initializeApp(config);

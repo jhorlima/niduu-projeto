@@ -125,6 +125,7 @@
 
     },
     destroyed() {
+      this.$axiosHelp.loading.enable = false;
 
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({video: true}).then(stream => {
