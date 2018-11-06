@@ -1,5 +1,5 @@
 const cors = require('cors');
-const error = require('config/error');
+const error = require('./config/error');
 const express = require('express');
 const bodyParser = require('body-parser');
 const errorhandler = require('errorhandler');
