@@ -10,9 +10,7 @@
   },
   "dependencies": {
     "cors": "2.7.1",
-    "methods": "1.1.2",
     "express": "^4.16.4",
-    "indicative": "^5.0.8",
     "errorhandler": "1.4.3",
     "body-parser": "1.15.0",
     "firebase-admin": "~6.0.0",

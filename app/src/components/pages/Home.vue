@@ -157,12 +157,21 @@
     },
     created() {
       this.getPhotos();
+      const messaging = Firebase.messaging();
+
+      messaging.requestPermission().then(() => {
+        return messaging.getToken();
+      }).then(token => console.log(token)).catch(err => console.error(err));
+
+      messaging.onMessage(payload => {
+        console.log('Message received. ', payload);
+      });
 
       if (navigator.geolocation) {
 
         navigator.geolocation.getCurrentPosition((position) => {
           this.coords = position.coords;
-        }, error => {
+        }, err => {
           this.coords.error = "Seu navegador recusou compartilhar a localização!";
         });
 
