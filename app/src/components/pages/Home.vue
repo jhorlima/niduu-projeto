@@ -126,27 +126,24 @@
         this.$axiosHelp.loading.enable = true;
 
         const user = Firebase.auth().currentUser;
-        const photosDatabaseRef = Firebase.database().ref('photos');
-
-        photo.likes = photo.likes || {};
-
-        if (unlike) {
-          photo.likes[user.uid] = null;
-        } else {
-          photo.likes[user.uid] = {
-            uid: user.uid,
-            provider: user.providerData.find(provider => provider)
-          };
-        }
-
-        photosDatabaseRef.child(photo.key).child('likes').set(photo.likes, error => {
+        const photosDatabaseRef = Firebase.database().ref(`photos/${photo.key}/likes/${user.uid}`);
+        const onComplete = error => {
           this.$axiosHelp.loading.enable = false;
           if (error) {
             this.snackbar(error.message);
           } else {
             this.getPhotos();
           }
-        });
+        };
+
+        if (unlike) {
+          photosDatabaseRef.remove(onComplete);
+        } else {
+          photosDatabaseRef.set({
+            uid: user.uid,
+            provider: user.providerData.find(provider => provider)
+          }, onComplete);
+        }
       },
       unlike(photo) {
         this.like(photo, true);
