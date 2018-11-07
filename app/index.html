@@ -4,34 +4,32 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
   <title>SnapNiduu</title>
+
   <link href="https://cdn.materialdesignicons.com/2.8.94/css/materialdesignicons.min.css" rel="stylesheet"/>
 
-  <link rel="icon" type="image/png" sizes="32x32" href=./static/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href=./static/images/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon-16x16.png">
 
-  <!--[if IE]><link rel="shortcut icon" href="./static/images/favicon.ico"><![endif]-->
-  <link rel="manifest" href="./static/manifest.json">
+  <!--[if IE]><link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon.ico"><![endif]-->
+  <link rel="manifest" href="<%= htmlWebpackPlugin.files.publicPath %>static/manifest.json">
   <meta name="theme-color" content="#fff">
 
   <!-- Add to home screen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="snapniduu">
-  <link rel="apple-touch-icon" href="./static/images/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/apple-touch-icon-152x152.png">
+  <link rel="stylesheet" href="<%= htmlWebpackPlugin.files.publicPath %>static/css/preloading.css">
 
-  <style>
-    [v-cloak] > * {
-      display: none
-    }
-
-    [v-cloak]::before {
-      content: "Carregando …"
-    }
-  </style>
 </head>
 <body class="layout-column">
-  <div class="flex" id="app" v-cloak></div>
+  <div id="app">
+    <div class="pre-loading" id="pre-loading">
+      <div></div>
+    </div>
+  </div>
 <!-- built files will be auto injected -->
 </body>
 </html>

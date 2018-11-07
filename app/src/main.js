@@ -43,7 +43,6 @@ const messaging = Firebase.messaging();
 
 messaging.usePublicVapidKey("BGySc2yaERisTCq0-QbrX6WHTYrMEBmgk3P690-SHfpHwmJWuClpBBVj7RInhvbcykcSmURV27b8ku5sw7ST17g");
 
-//dev
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./static/firebase-messaging-sw.js').then((registration) => {
     messaging.useServiceWorker(registration);

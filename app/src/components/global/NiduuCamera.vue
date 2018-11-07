@@ -1,9 +1,9 @@
 <template>
-  <div class="mdc-dialog" aria-modal="true" aria-labelledby="my-dialog-title" ref="dialog">
+  <div class="mdc-dialog" ref="dialog">
     <div class="mdc-dialog__container">
       <div class="mdc-dialog__surface">
 
-        <div class="mdc-dialog__content" id="my-dialog-content">
+        <div class="mdc-dialog__content">
 
           <video v-show="!photo" width="500" height="375" ref="video" autoplay></video>
           <canvas v-show="photo" width="500" height="375" ref="canvas"></canvas>

@@ -15,8 +15,23 @@
     </div>
 
     <fab label="Adicionar Foto" icon="plus" @action="abrirCamera"></fab>
+
     <niduu-camera v-if="camera" :coords="coords" @close="fecharCamera" @send="adicionarFotos" @error="snackbar"></niduu-camera>
+
     <snackbar v-if="notification" :message="notification" @action="dismissNotification"></snackbar>
+
+    <confirm-dialog v-if="askNotificationPush" @no="denyNotifications" @yes="allowNotifications">
+      <h2 slot="title" class="mdc-dialog__title">Usar Notificações</h2>
+
+      <p>
+        Para uma melhor experiência com o SnapNiduu, recomendamos que você permita o uso de notificações por nosso aplicativo.
+      </p>
+
+      <check-box v-model="noAskNotificationAgain" id="noAsk" :required="false">Não perguntar novamente</check-box>
+
+      <span slot="no">Fechar</span>
+      <span slot="yes">Permitir</span>
+    </confirm-dialog>
 
   </div>
 
@@ -27,24 +42,30 @@
 
   import Fab from '../global/Fab';
   import Snackbar from '../global/Snackbar';
+  import CheckBox from '../global/CheckBox';
   import PhotoCard from '../global/PhotoCard';
   import NiduuCamera from '../global/NiduuCamera';
+  import ConfirmDialog from '../global/ConfirmDialog';
 
   export default {
     name: "Home",
     components: {
-      NiduuCamera,
-      PhotoCard,
+      Fab,
       Snackbar,
-      Fab
+      CheckBox,
+      PhotoCard,
+      NiduuCamera,
+      ConfirmDialog,
     },
     data() {
       return {
         coords: {},
         photos: {},
         camera: false,
+        hasPhotos: false,
         notification: null,
-        hasPhotos: false
+        askNotificationPush: false,
+        noAskNotificationAgain: false,
       };
     },
     methods: {
@@ -131,6 +152,7 @@
         this.like(photo, true);
       },
       snackbar(message) {
+        this.notification = null;
         this.notification = message;
       },
       dismissNotification() {
@@ -141,6 +163,36 @@
         photosRef.once('value', photos => {
           this.hasPhotos = photos.hasChildren();
           this.photos = photos.val();
+        });
+      },
+      allowNotifications(dialog) {
+        dialog.close();
+        localStorage.setItem('noAskNotificationAgain', this.noAskNotificationAgain ? "1" : "0");
+        dialog.listen('MDCDialog:closed', () => {
+          this.askNotificationPush = false;
+          Firebase.messaging().requestPermission().then(() => {
+            this.getNotificationToken();
+          });
+        });
+      },
+      denyNotifications(dialog) {
+        dialog.close();
+        localStorage.setItem('noAskNotificationAgain', this.noAskNotificationAgain ? "1" : "0");
+        dialog.listen('MDCDialog:closed', () => {
+          this.askNotificationPush = false;
+        });
+      },
+      getNotificationToken() {
+        Firebase.messaging().getToken().then(token => {
+          const user = Firebase.auth().currentUser;
+          const tokensDatabaseRef = Firebase.database().ref(`tokens_messaging/${user.uid}`);
+          tokensDatabaseRef.child('token').set(token, err => {
+            if (err) {
+              this.snackbar(err.message);
+            }
+          });
+        }).catch(err => {
+          this.snackbar(err.message);
         });
       }
     },
@@ -157,27 +209,36 @@
     },
     created() {
       this.getPhotos();
-      const messaging = Firebase.messaging();
 
-      messaging.requestPermission().then(() => {
-        return messaging.getToken();
-      }).then(token => console.log(token)).catch(err => console.error(err));
-
-      messaging.onMessage(payload => {
-        console.log('Message received. ', payload);
-      });
+      const noAskNotificationAgain = localStorage.getItem('noAskNotificationAgain') || "0";
+      this.noAskNotificationAgain = noAskNotificationAgain === "1";
 
       if (navigator.geolocation) {
 
         navigator.geolocation.getCurrentPosition((position) => {
           this.coords = position.coords;
-        }, err => {
+        }, () => {
           this.coords.error = "Seu navegador recusou compartilhar a localização!";
         });
 
       } else {
         this.coords.error = "Seu navegador não permite localização!";
       }
+    },
+    mounted() {
+      this.askNotificationPush = Firebase.messaging.isSupported() && Notification.permission !== "granted" && !this.noAskNotificationAgain;
+
+      const messaging = Firebase.messaging();
+
+      messaging.onMessage(payload => {
+        this.snackbar(payload.notification.body);
+      });
+
+      if (Notification.permission === "granted") {
+        this.getNotificationToken();
+      }
+
+      messaging.onTokenRefresh(() => this.getNotificationToken());
     }
   };
 </script>

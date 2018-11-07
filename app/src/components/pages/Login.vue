@@ -1,5 +1,8 @@
 <template>
   <div class="layout-align-center-stretch layout-column flex">
+    <div class="layout-column layout-align-center-center">
+      <img src="@/assets/logo.png" alt="Logo da Niduu">
+    </div>
     <div ref="firebaseui"></div>
     <snackbar v-if="notification" :message="notification" @action="dismissNotification()"></snackbar>
   </div>
