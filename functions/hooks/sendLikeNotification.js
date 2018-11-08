@@ -1,64 +1,54 @@
-module.exports = (functions, admin) => {
-    const pathLike = '/photos/{userUid}/likes/{userLikeUid}';
-    const likesRef = functions.database.ref(pathLike);
-    console.log("chegou!", likesRef);
+module.exports = (functions) => {
+    const admin = require('firebase-admin');
+    const serviceAccount = require('./../config/niduu-1961d-firebase-adminsdk-tgmg8-aed6994dff');
 
-    return likesRef.onCreate((change, context) => {
-        console.log("chegou!");
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        databaseURL: 'https://niduu-1961d.firebaseio.com'
+    });
 
-        const userUid = context.params.userUid;
-        const userLikeUid = context.params.userLikeUid;
+    const likesRef = functions.database.ref( '/photos/{photoId}/likes/{userLikeUid}');
 
-        const pathTokenNotification = `/tokens_messaging/${userUid}/token`;
-        const tokenNotificationRef = functions.database().ref(pathTokenNotification);
+    return likesRef.onCreate((snapshot, context) => {
 
-        const getLikeProfilePromise = admin.auth().getUser(userLikeUid);
-        const getToken = tokenNotificationRef.once('value');
+        return snapshot.ref.parent.parent.child('uid').once("value").then(userUid => {
 
-        return Promise.all([getToken, getLikeProfilePromise]).then(results => {
+            if (userUid.val() === context.auth.uid) {
+                return console.log(`The user likes his photo.`);
+            }
 
-            const token = results[0];
-            const user = results[1];
+            const userLikeUid = context.auth.uid;
+            const tokenNotificationRef = admin.database().ref(`/tokens_messaging/${userUid.val()}/tokens`);
 
-            console.log(results);
+            return Promise.all([tokenNotificationRef.once('value'), admin.auth().getUser(userLikeUid)]).then(results => {
+                const tokens = results.shift();
+                const user = results.shift();
 
-            // // Check if there are any device tokens.
-            // if (!tokensSnapshot.hasChildren()) {
-            //     return console.log('There are no notification tokens to send to.');
-            // }
-            // console.log('There are', tokensSnapshot.numChildren(), 'tokens to send notifications to.');
-            // console.log('Fetched follower profile', follower);
-            //
-            // // Notification details.
-            // const payload = {
-            //     notification: {
-            //         title: 'You have a new follower!',
-            //         body: `${follower.displayName} is now following you.`,
-            //         icon: follower.photoURL
-            //     }
-            // };
-            //
-            // // Listing all tokens as an array.
-            // tokens = Object.keys(tokensSnapshot.val());
-            // // Send notifications to all tokens.
-            // return admin.messaging().sendToDevice(tokens, payload);
-        }).then((response) => {
-            console.log(response);
-            // For each message check if there was an error.
-            // const tokensToRemove = [];
-            // response.results.forEach((result, index) => {
-            //     const error = result.error;
-            //     if (error) {
-            //         console.error('Failure sending notification to', tokens[index], error);
-            //         // Cleanup the tokens who are not registered anymore.
-            //         if (error.code === 'messaging/invalid-registration-token' ||
-            //             error.code === 'messaging/registration-token-not-registered') {
-            //             tokensToRemove.push(tokensSnapshot.ref.child(tokens[index]).remove());
-            //         }
-            //     }
-            // });
-            // return Promise.all(tokensToRemove);
+                if (!tokens.hasChildren()) {
+                    return console.log('There are no notification tokens to send to.');
+                }
+
+                const payload = {
+                    notification: {
+                        title: 'Você tem uma nova curtida!',
+                        body: `${user.displayName} curtiu sua foto.`,
+                        icon: user.photoURL
+                    }
+                };
+                const tokensVal = tokens.val();
+                const tokenList = Object.keys(tokensVal).map(key => tokensVal[key]);
+
+                return admin.messaging().sendToDevice(tokenList, payload).then(success => {
+                    console.log(success);
+                }).catch(err => {
+                    console.log(err);
+                });
+
+            }).catch(err => {
+                return err.message;
+            });
         });
+
     });
 
 };

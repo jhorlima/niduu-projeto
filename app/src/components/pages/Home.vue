@@ -5,6 +5,7 @@
     <div class="layout-row layout-wrap flex layout-padding" :class="layout">
 
       <div v-if="!hasPhotos">
+        <img src="@/assets/birdniduu.png" width="300px" alt="Bird da Niduu">
         <p align="center">Não há fotos para serem exibidas no momento.</p>
       </div>
 
@@ -31,6 +32,7 @@
 
       <span slot="no">Fechar</span>
       <span slot="yes">Permitir</span>
+
     </confirm-dialog>
 
   </div>
@@ -38,6 +40,7 @@
 </template>
 
 <script>
+  import md5 from 'md5';
   import Firebase from 'firebase';
 
   import Fab from '../global/Fab';
@@ -93,14 +96,11 @@
               uid: user.uid,
               user_provider: user.providerData.find(provider => provider),
               likes: {}
-            }, error => {
-              this.$axiosHelp.loading.enable = false;
-              if (error) {
-                this.snackbar(error.message);
-              } else {
-                dialog.close('send');
-                this.getPhotos();
-              }
+            }).then(() => {
+              dialog.close('send');
+              this.getPhotos();
+            }).catch(err => {
+              this.snackbar(err.message);
             });
           });
         });
@@ -113,13 +113,10 @@
         this.$axiosHelp.loading.enable = true;
         const photosDatabaseRef = Firebase.database().ref('photos');
 
-        photosDatabaseRef.child(photo.key).remove(error => {
-          this.$axiosHelp.loading.enable = false;
-          if (error) {
-            this.snackbar(error.message);
-          } else {
-            this.getPhotos();
-          }
+        photosDatabaseRef.child(photo.key).remove().then(() => {
+          this.getPhotos();
+        }).catch(err => {
+          this.snackbar(err.message);
         });
       },
       like(photo, unlike) {
@@ -127,22 +124,22 @@
 
         const user = Firebase.auth().currentUser;
         const photosDatabaseRef = Firebase.database().ref(`photos/${photo.key}/likes/${user.uid}`);
-        const onComplete = error => {
-          this.$axiosHelp.loading.enable = false;
-          if (error) {
-            this.snackbar(error.message);
-          } else {
-            this.getPhotos();
-          }
-        };
 
         if (unlike) {
-          photosDatabaseRef.remove(onComplete);
+          photosDatabaseRef.remove().then(() => {
+            this.getPhotos();
+          }).catch(err => {
+            this.snackbar(err.message);
+          });
         } else {
           photosDatabaseRef.set({
             uid: user.uid,
             provider: user.providerData.find(provider => provider)
-          }, onComplete);
+          }).then(() => {
+            this.getPhotos();
+          }).catch(err => {
+            this.snackbar(err.message);
+          });
         }
       },
       unlike(photo) {
@@ -157,7 +154,7 @@
       },
       getPhotos() {
         const photosRef = Firebase.database().ref('photos');
-        photosRef.once('value', photos => {
+        photosRef.once('value').then(photos => {
           this.hasPhotos = photos.hasChildren();
           this.photos = photos.val();
         });
@@ -181,13 +178,16 @@
       },
       getNotificationToken() {
         Firebase.messaging().getToken().then(token => {
+          const hash = md5(token);
           const user = Firebase.auth().currentUser;
-          const tokensDatabaseRef = Firebase.database().ref(`tokens_messaging/${user.uid}`);
-          tokensDatabaseRef.child('token').set(token, err => {
-            if (err) {
+          const tokensDatabaseRef = Firebase.database().ref(`tokens_messaging/${user.uid}/tokens/${hash}`);
+          localStorage.setItem('notificationToken', token);
+          localStorage.setItem('notificationHash', hash);
+          tokensDatabaseRef.set(token)
+            .then(() => {})
+            .catch(err => {
               this.snackbar(err.message);
-            }
-          });
+            });
         }).catch(err => {
           this.snackbar(err.message);
         });

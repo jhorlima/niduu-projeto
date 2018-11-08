@@ -3,17 +3,20 @@ $mdc-theme-secondary: #30c6cd;
 $mdc-theme-background: #fff;
 $mdc-typography-font-family: 'Google Sans', Roboto, sans-serif !default;
 
-@import "~@material/fab/mdc-fab";
 @import "~@material/card/mdc-card";
 @import "~@material/theme/mdc-theme";
 @import "~@material/ripple/mdc-ripple";
+
 @import "~@material/button/mdc-button";
-@import "~@material/dialog/mdc-dialog";
+@import "~@material/fab/mdc-fab";
+
+@import "~@material/form-field/mdc-form-field";
 @import "~@material/checkbox/mdc-checkbox";
+
+@import "~@material/dialog/mdc-dialog";
 @import "~@material/snackbar/mdc-snackbar";
 @import "~@material/elevation/mdc-elevation";
 @import "~@material/typography/mdc-typography";
-@import "~@material/form-field/mdc-form-field";
 @import "~@material/top-app-bar/mdc-top-app-bar";
 @import "~@material/icon-button/mdc-icon-button";
 @import "~@material/linear-progress/mdc-linear-progress";

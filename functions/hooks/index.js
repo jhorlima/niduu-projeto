@@ -1,5 +1,5 @@
-module.exports = (functions, admin) => {
+module.exports = (functions) => {
     return {
-        sendLikeNotification: require('./sendLikeNotification')(functions, admin)
+        sendLikeNotification: require('./sendLikeNotification')(functions)
     };
 };
