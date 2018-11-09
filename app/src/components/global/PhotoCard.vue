@@ -46,7 +46,7 @@
     },
     data(){
       return {
-        showProfilePhoto: false
+        showProfilePhoto: false,
       };
     },
     methods: {

@@ -4,13 +4,13 @@
 
     <div class="layout-row layout-wrap flex layout-padding" :class="layout">
 
-      <div v-if="!hasPhotos">
+      <div v-if="!photos.length">
         <img src="@/assets/birdniduu.png" width="300px" alt="Bird da Niduu">
         <p align="center">Não há fotos para serem exibidas no momento.</p>
       </div>
 
-      <div class="flex flex-xs-100 flex-gt-xs-50 flex-gt-sm-33 flex-gt-lg-25" v-for="(photo, key) in photos">
-        <photo-card :photo="photo" :key="key" @delete="apagarFoto" @like="like" @unlike="unlike"></photo-card>
+      <div class="flex flex-xs-100 flex-gt-xs-50 flex-gt-sm-33 flex-gt-lg-25" v-for="photo in sortedPhotos">
+        <photo-card :photo="photo" :key="photo.key" @delete="apagarFoto" @like="like" @unlike="unlike"></photo-card>
       </div>
 
     </div>
@@ -63,7 +63,7 @@
     data() {
       return {
         coords: {},
-        photos: {},
+        photos: [],
         camera: false,
         hasPhotos: false,
         notification: null,
@@ -89,6 +89,7 @@
         photosStorageRef.child(`${key}.png`).putString(send, 'data_url').then(snapshot => {
           snapshot.ref.getDownloadURL().then(downloadURL => {
             photosDatabaseRef.child(key).set({
+              date: Date.now(),
               key: key,
               image: downloadURL,
               latitude: !this.coords.error ? this.coords.latitude : null,
@@ -101,6 +102,8 @@
               this.getPhotos();
             }).catch(err => {
               this.snackbar(err.message);
+            }).finally(() => {
+              this.$axiosHelp.loading.enable = false;
             });
           });
         });
@@ -117,6 +120,8 @@
           this.getPhotos();
         }).catch(err => {
           this.snackbar(err.message);
+        }).finally(() => {
+          this.$axiosHelp.loading.enable = false;
         });
       },
       like(photo, unlike) {
@@ -130,6 +135,8 @@
             this.getPhotos();
           }).catch(err => {
             this.snackbar(err.message);
+          }).finally(() => {
+            this.$axiosHelp.loading.enable = false;
           });
         } else {
           photosDatabaseRef.set({
@@ -139,6 +146,8 @@
             this.getPhotos();
           }).catch(err => {
             this.snackbar(err.message);
+          }).finally(() => {
+            this.$axiosHelp.loading.enable = false;
           });
         }
       },
@@ -153,11 +162,7 @@
         this.notification = null;
       },
       getPhotos() {
-        const photosRef = Firebase.database().ref('photos');
-        photosRef.once('value').then(photos => {
-          this.hasPhotos = photos.hasChildren();
-          this.photos = photos.val();
-        });
+        //
       },
       allowNotifications(dialog) {
         dialog.close();
@@ -196,9 +201,12 @@
     computed: {
       layout() {
         return {
-          'layout-align-center-center': !this.hasPhotos,
-          'layout-align-none-none': !this.hasPhotos,
+          'layout-align-center-center': !this.photos.length,
+          'layout-align-none-none': !this.photos.length,
         };
+      },
+      sortedPhotos(){
+        return this.photos.sort((a, b) => new Date(b.date) - new Date(a.date));
       }
     },
     beforeRouteEnter(to, from, next) {
@@ -221,6 +229,31 @@
       } else {
         this.coords.error = "Seu navegador não permite localização!";
       }
+
+      const photosRef = Firebase.database().ref('photos').limitToLast(25).orderByChild('date');
+
+      photosRef.on('child_added', snapshot => {
+        this.photos.unshift(snapshot.val());
+      });
+
+      photosRef.on('child_removed', snapshot => {
+        const photo = this.photos.find(photo => snapshot.key === photo.key);
+        const index = this.photos.indexOf(photo);
+
+        if (index >= 0) {
+          this.photos.splice(index, 1);
+        }
+      });
+
+      photosRef.on('child_changed', snapshot => {
+        const photo = this.photos.find(photo => snapshot.key === photo.key);
+        const index = this.photos.indexOf(photo);
+
+        if (index >= 0) {
+          this.photos.splice(index, 1);
+          this.photos.unshift(snapshot.val());
+        }
+      });
     },
     mounted() {
       this.askNotificationPush = Firebase.messaging.isSupported() && Notification.permission !== "granted" && !this.noAskNotificationAgain;

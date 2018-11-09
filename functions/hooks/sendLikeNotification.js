@@ -7,7 +7,7 @@ module.exports = (functions) => {
         databaseURL: 'https://niduu-1961d.firebaseio.com'
     });
 
-    const likesRef = functions.database.ref( '/photos/{photoId}/likes/{userLikeUid}');
+    const likesRef = functions.database.ref('/photos/{photoId}/likes/{userLikeUid}');
 
     return likesRef.onCreate((snapshot, context) => {
 
