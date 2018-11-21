@@ -12,7 +12,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon-16x16.png">
 
-  <!--[if IE]><link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon.ico"><![endif]-->
+  <!--[if IE]>
+  <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.publicPath %>static/images/favicon.ico"><![endif]-->
   <link rel="manifest" href="<%= htmlWebpackPlugin.files.publicPath %>static/manifest.json">
   <meta name="theme-color" content="#fff">
 
@@ -25,11 +26,14 @@
 
 </head>
 <body class="layout-column">
-  <div id="app">
-    <div class="pre-loading" id="pre-loading">
-      <div></div>
-    </div>
+<noscript>
+  É necessário que o JavaScript esteja habilitado para esse site funcionar
+</noscript>
+<div id="app">
+  <div class="pre-loading" id="pre-loading">
+    <div></div>
   </div>
+</div>
 <!-- built files will be auto injected -->
 </body>
 </html>
